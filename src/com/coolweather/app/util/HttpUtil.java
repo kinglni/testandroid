@@ -25,14 +25,19 @@ public class HttpUtil {
 						connection=(HttpURLConnection)url.openConnection();
 					connection.setConnectTimeout(8000);
 					connection.setReadTimeout(8000);
+					connection.setRequestMethod("GET");
+					connection.setRequestProperty("Charsert","GBK");
+					connection.setRequestProperty("content-Type","application/json");
 					InputStream in=connection.getInputStream();
-					BufferedReader reader=new BufferedReader(new InputStreamReader(in));
+					BufferedReader reader=new BufferedReader(new InputStreamReader(in,"GBK"));
 					StringBuilder response=new StringBuilder();
 					String line;
 					while((line=reader.readLine())!=null){
+						
 						response.append(line);
 					}
 					if(listener!=null){
+						
 						listener.onFinish(response.toString());
 					}
 				} catch (MalformedURLException e) {

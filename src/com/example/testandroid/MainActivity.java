@@ -1,5 +1,7 @@
 package com.example.testandroid;
 
+import com.coolweather.app.util.HttpCallbackListener;
+import com.coolweather.app.util.HttpUtil;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,6 +14,20 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        String address;
+    		address="http://10.0.2.2/province.json";
+    		HttpUtil.sendHttpRequest(address,new HttpCallbackListener(){
+    			@Override
+    			public void onFinish(String response){
+    				
+    			}
+    				
+    				@Override
+				public void onError(Exception e) {
+					// TODO Auto-generated method stub
+    					System.out.println(e);
+    				}
+    		});
     }
 
     @Override
