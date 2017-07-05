@@ -27,7 +27,7 @@ public class MainActivity extends Activity {
 	private TextView titleText;
 	private ListView listView;
 	private ArrayAdapter<String> adapter;
-	private CoolWeatherDB coolWeatherDB;
+	private CoolWeatherDB db;
 	private List<String> dataList=new ArrayList<String>();
 	private List<Province> provinceList;
 	private List<City> cityList;
@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-       CoolWeatherDB db ;
+      
        db=CoolWeatherDB.getInstance(this);
        Province province=new Province();
        
@@ -51,20 +51,9 @@ public class MainActivity extends Activity {
         city.setEnName("nanping");
         city.setSEnName("np");
         db.SaveCity(city);
-        
-        queryProvinces();
-        String address;
-    		address="http://10.0.2.2/province.json";
-    		HttpUtil.sendHttpRequest(address,new HttpCallbackListener(){
-    			@Override
-    			public void onFinish(String response){
-    			}
-    				@Override
-				public void onError(Exception e) {
-					// TODO Auto-generated method stub
-    					System.out.println(e);
-    				}
-    		});
+        currentLevel=LEVEL_CITY;
+        queryFromServer(null,"province");
+
     }
 
     @Override
@@ -88,7 +77,7 @@ public class MainActivity extends Activity {
     protected void queryProvinces() {
 		// TODO Auto-generated method stub
 		
-		provinceList=coolWeatherDB.loadProvince();
+		provinceList=db.loadProvince();
 		if(provinceList.size()>0){
 			dataList.clear();
 			for(Province province:provinceList){
@@ -100,9 +89,8 @@ public class MainActivity extends Activity {
 			}
 		}else{
 		queryFromServer(null,"province");
-	}
-	
-}
+	}}
+    
 	private void queryFromServer(final String code, final String type) {
 		// TODO Auto-generated method stub
 		String address;
@@ -110,29 +98,23 @@ public class MainActivity extends Activity {
 			address="http://10.0.2.2/all_city.json";}else{
 				address="http://10.0.2.2/province.json";
 		}
-		showProgressDialog();
+		
 		HttpUtil.sendHttpRequest(address,new HttpCallbackListener(){
 			@Override
 			public void onFinish(String response){
 				boolean result=false;
 				if("province".equals(type)){
-					result=Utility.handleProvinceResponse(coolWeatherDB,response);
+					result=Utility.handleProvinceResponse(db,response);
 				}else if("city".equals(type)){
-					result=Utility.handleCityResponse(coolWeatherDB,response);
+					result=Utility.handleCityResponse(db,response);
 				}
-				if(result){
-					runOnUiThread(new Runnable(){
-						@Override
-						public void run() {
-							// TODO Auto-generated method stub
-							closeProgressDialog();
-							if("province".equals(type)){
-								queryProvinces();
-							}else if("city".equals(type)){
-								queryCities();
-							}
-						}
-					});
-				}
+				
 			}
-}
+
+			@Override
+			public void onError(Exception e) {
+				// TODO Auto-generated method stub
+				
+			}
+			});
+	}}
